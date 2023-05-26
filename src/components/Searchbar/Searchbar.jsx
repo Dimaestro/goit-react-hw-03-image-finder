@@ -1,20 +1,34 @@
 import { Component } from 'react';
+import { toast } from 'react-toastify';
+import { FaSearch } from 'react-icons/fa';
+import PropTypes from 'prop-types';
 import styles from './Searchbar.module.css';
 
+
 class Searchbar extends Component {
+  static propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+  }
+  
   state = {
-    findValue: ''
+    findValue: '',
   }
 
   handleChange = (event) => {
     const { name, value } = event.target;
-    this.setState({[name]: value});
+    this.setState({[name]: value.toLowerCase()});
   }
 
   handleSubmit = (event) => {
     event.preventDefault();
+    const { findValue } = this.state;
+    
+    if (findValue.trim() === '') {
+      toast.error('Please enter image name!')
+      return;
+    }
 
-    this.props.onSubmit(this.state.findValue);
+    this.props.onSubmit(findValue.trim());
     this.setState({ findValue: '' });
   }
 
@@ -24,7 +38,7 @@ class Searchbar extends Component {
       <header className={styles.searchbar}>
         <form className={styles.form} onSubmit={this.handleSubmit}>
           <button type="submit" className={styles.button}>
-            <span className={styles.buttonLabel}>Search</span>
+            <span><FaSearch size={24}/></span>
           </button>
 
           <input
