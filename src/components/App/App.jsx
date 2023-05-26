@@ -21,11 +21,11 @@ class App extends Component {
     loading: false,
   };
 
-  async componentDidUpdate(prevProps,prevState) {
+  async componentDidUpdate(prevProps, prevState) {
     const { page, findName } = this.state;
     console.log(prevProps, prevState);
     if (prevState.findName !== findName || prevState.page !== page) {
-      this.setState({loading: true});
+      this.setState({ loading: true });
       try {
         const {
           data: { hits: images },
@@ -44,16 +44,15 @@ class App extends Component {
             largeImageURL: largeImageURL,
           };
         });
-        console.log(dataImages);
+
         this.setState(prevState => ({
           images: [...prevState.images, ...dataImages],
           loading: false,
         }));
-    } catch (err) {
-      toast.error(err.message);
+      } catch (err) {
+        toast.error(err.message);
+      }
     }
-    }
-    
   }
 
   handleSabmit = value => {
