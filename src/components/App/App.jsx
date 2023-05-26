@@ -16,18 +16,19 @@ class App extends Component {
     findName: '',
     images: [],
     showModal: false,
-    status: 'idle',
     modalImage: '',
     page: 1,
     loading: false,
   };
 
-  async componentDidUpdate() {
-    const {page, loading, findName} = this.state;
-    if (loading) {
+  async componentDidUpdate(prevProps,prevState) {
+    const { page, findName } = this.state;
+    console.log(prevProps, prevState);
+    if (prevState.findName !== findName || prevState.page !== page) {
+      this.setState({loading: true});
       try {
         const {
-          data: { hits: images }
+          data: { hits: images },
         } = await pixabayApi.getImages(findName, page);
 
         if (images.length === 0) {
@@ -36,21 +37,23 @@ class App extends Component {
           return;
         }
 
-        const dataImages = images.map(({id, webformatURL, largeImageURL}) => {
+        const dataImages = images.map(({ id, webformatURL, largeImageURL }) => {
           return {
             id: id,
             webformatURL: webformatURL,
             largeImageURL: largeImageURL,
           };
         });
+        console.log(dataImages);
         this.setState(prevState => ({
           images: [...prevState.images, ...dataImages],
           loading: false,
         }));
-      } catch (err) {
-        toast.error(err.message);
-      }
+    } catch (err) {
+      toast.error(err.message);
     }
+    }
+    
   }
 
   handleSabmit = value => {
@@ -58,7 +61,6 @@ class App extends Component {
       findName: value,
       images: [],
       page: 1,
-      loading: true,
     });
   };
 
@@ -74,20 +76,19 @@ class App extends Component {
   loadMore = () => {
     this.setState(prevState => ({
       page: prevState.page + 1,
-      loading: true,
     }));
   };
 
   render() {
-    const { images, showModal, modalImage, loading, } = this.state;
-    
+    const { images, showModal, modalImage, loading } = this.state;
+
     return (
       <>
         <div className={styles.app}>
           <Searchbar onSubmit={this.handleSabmit} />
           <ImageGallery images={images} onClick={this.toggleModal} />
         </div>
-        {images.length >= 12 && <Button onClick={this.loadMore}/>}
+        {images.length >= 12 && <Button onClick={this.loadMore} />}
         {loading && <Loader />}
         {showModal && (
           <Modal modalImage={modalImage} onClose={this.toggleModal} />
